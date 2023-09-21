@@ -1,0 +1,10 @@
+ID_curso,Id_sede,Nombre_curso,Horario,Duracion,Dias,Cantidad_estudiantes
+"12,11,Ciencias,7,1,""lunes,martes"",12"
+"23,22,Sociales,21,2,""jueves,viernes"",34"
+"123,33,Historia,12,3,""lunes,miercoles,viernes"",13"
+"345,44,Programacion,10,3,""lunes,martes"",32"
+"32,55,Matematica,11,2,""miercoles,viernes"",56"
+"1233,66,Calculo,12,1,""miercoles,jueves"",45"
+"2345,77,Algebra,15,3,""martes, jueves"",39"
+"566,99,Lengua,17,2,""lunes,miercoles,viernes"",11"
+"321,88,Quimica,19,2,""martes, jueves"",57"

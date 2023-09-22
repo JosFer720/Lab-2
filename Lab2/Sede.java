@@ -1,17 +1,19 @@
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Esta clase representa una sede que puede contener varios edificios.
+ * La clase Sede representa una sede con un identificador, un nombre y una lista de edificios.
  */
 public class Sede {
-    // Atributos de la sede
-    private int idSede;
-    private String nombre;
-    private List<Edificio> edificios;
+    private int idSede;          // Identificador de la sede
+    private String nombre;       // Nombre de la sede
+    private List<Edificio> edificios; // Lista de edificios en la sede
 
     /**
      * Constructor de la clase Sede.
      *
-     * @param idSede  El identificador único de la sede.
-     * @param nombre  El nombre de la sede.
+     * @param idSede El identificador único de la sede.
+     * @param nombre El nombre de la sede.
      */
     public Sede(int idSede, String nombre) {
         this.idSede = idSede;
@@ -19,12 +21,10 @@ public class Sede {
         this.edificios = new ArrayList<>();
     }
 
-    // Getters y setters
-
     /**
-     * Obtiene el identificador único de la sede.
+     * Obtiene el identificador de la sede.
      *
-     * @return El identificador único de la sede.
+     * @return El identificador de la sede.
      */
     public int getIdSede() {
         return idSede;
@@ -40,18 +40,18 @@ public class Sede {
     }
 
     /**
-     * Obtiene la lista de edificios asociados a la sede.
+     * Obtiene la lista de edificios en la sede.
      *
-     * @return La lista de edificios de la sede.
+     * @return La lista de edificios en la sede.
      */
     public List<Edificio> getEdificios() {
         return edificios;
     }
 
     /**
-     * Establece el identificador único de la sede.
+     * Establece el identificador de la sede.
      *
-     * @param idSede El nuevo identificador único de la sede.
+     * @param idSede El identificador único de la sede.
      */
     public void setIdSede(int idSede) {
         this.idSede = idSede;
@@ -60,49 +60,74 @@ public class Sede {
     /**
      * Establece el nombre de la sede.
      *
-     * @param nombre El nuevo nombre de la sede.
+     * @param nombre El nombre de la sede.
      */
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
     /**
-     * Agrega un edificio a la lista de edificios de la sede.
+     * Agrega un edificio a la sede.
      *
-     * @param nombreEdificio El nombre del edificio a agregar.
-     * @param nivel          El nivel del edificio a agregar.
+     * @param edificio El edificio a agregar.
      */
-    public void agregarEdificio(String nombreEdificio, int nivel) {
-        Edificio edificio = new Edificio(nombreEdificio, nivel);
+    public void agregarEdificio(Edificio edificio) {
         edificios.add(edificio);
     }
 
     /**
-     * Agrega un salón a un edificio específico dentro de la sede.
+     * Agrega un salón a un edificio en la sede, especificando el ID del salón, su capacidad y el nombre del edificio.
      *
-     * @param idSalon       El identificador único del salón.
-     * @param capacidad     La capacidad del salón.
-     * @param horario       El horario del salón.
-     * @param nombreEdificio El nombre del edificio al que se va a agregar el salón.
+     * @param idSalon       El ID del salón a agregar.
+     * @param capacidad     La capacidad del salón a agregar.
+     * @param nombreEdificio El nombre del edificio en el que se debe agregar el salón.
      */
-    public void agregarSalon(int idSalon, int capacidad, Horario horario, String nombreEdificio) {
-        // ...
+    public void agregarSalon(int idSalon, int capacidad, String nombreEdificio) {
+        Edificio edificio = buscarEdificioPorNombre(nombreEdificio);
+        if (edificio != null) {
+            edificio.agregarSalon(idSalon, capacidad);
+        } else {
+            System.out.println("El edificio " + nombreEdificio + " no existe en esta sede.");
+        }
     }
 
     /**
-     * Busca un salón disponible para un curso en los edificios de la sede.
+     * Busca un salón disponible en la sede.
      *
-     * @param curso El curso para el que se busca un salón disponible.
-     * @return Un salón disponible para el curso o null si no se encuentra ninguno.
+     * @return El salón disponible encontrado o null si no se encontró ninguno.
      */
-    public Salon buscarSalonDisponible(Curso curso) {
-        // ...
+    public Salon buscarSalonDisponible() {
+        for (Edificio edificio : edificios) {
+            List<Salon> salonesDisponibles = edificio.buscarSalonesDisponibles();
+            for (Salon salon : salonesDisponibles) {
+                return salon;
+            }
+        }
+        return null;
     }
 
     /**
-     * Imprime la información de la sede, incluyendo sus edificios.
+     * Busca un edificio en la sede por su nombre.
+     *
+     * @param nombre El nombre del edificio a buscar.
+     * @return El edificio encontrado o null si no se encontró.
+     */
+    public Edificio buscarEdificioPorNombre(String nombre) {
+        for (Edificio edificio : edificios) {
+            if (edificio.getNombre().equals(nombre)) {
+                return edificio;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Imprime la información de la sede, incluyendo su nombre y la información de sus edificios.
      */
     public void imprimirInformacionSede() {
-        // ...
+        System.out.println("Sede: " + nombre);
+        for (Edificio edificio : edificios) {
+            edificio.imprimirInformacionEdificio();
+        }
     }
 }

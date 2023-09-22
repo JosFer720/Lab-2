@@ -1,23 +1,21 @@
 /**
- * Esta clase representa un salón con capacidad y horario asociado.
+ * Esta clase representa un salón con capacidad.
  */
 public class Salon {
     // Atributos del salón
     private int idSalon;
     private int capacidad;
-    private Horario horario;
+    private boolean ocupado;
 
     /**
      * Constructor de la clase Salon.
      *
      * @param idSalon   El identificador único del salón.
      * @param capacidad La capacidad del salón.
-     * @param horario   El horario del salón.
      */
-    public Salon(int idSalon, int capacidad, Horario horario) {
+    public Salon(int idSalon, int capacidad) {
         this.idSalon = idSalon;
         this.capacidad = capacidad;
-        this.horario = horario;
     }
 
     /**
@@ -39,39 +37,33 @@ public class Salon {
     }
 
     /**
-     * Obtiene el horario del salón.
+     * Verifica si el salón está ocupado.
      *
-     * @return El horario del salón.
+     * @return true si el salón está ocupado, false si no lo está.
      */
-    public Horario getHorario() {
-        return horario;
+    public boolean isOcupado() {
+        return ocupado;
     }
 
     /**
-     * Verifica si el horario del salón está disponible.
-     *
-     * @return true si el horario del salón está disponible, false en caso contrario.
+     * Ocupa el salón, estableciendo su estado como ocupado.
      */
-    public boolean horarioDisponible() {
-        return horario.isDisponible();
+    public void ocupar() {
+        ocupado = true;
     }
 
     /**
-     * Asigna un horario al salón con una hora de inicio y una hora de fin.
-     *
-     * @param horaInicio La hora de inicio del horario a asignar.
-     * @param horaFin    La hora de fin del horario a asignar.
+     * Desocupa el salón, estableciendo su estado como desocupado.
      */
-    public void asignarHorario(int horaInicio, int horaFin) {
-        horario.asignarHorario(horaInicio, horaFin);
+    public void desocupar() {
+        ocupado = false;
     }
 
     /**
-     * Imprime la información del salón, incluyendo su identificador, capacidad y disponibilidad de horario.
+     * Imprime la información del salón, incluyendo su identificador y capacidad.
      */
     public void imprimirInformacionSalon() {
         System.out.println("Salon " + idSalon);
         System.out.println("Capacidad: " + capacidad);
-        System.out.println("Horario Disponible: " + (horarioDisponible() ? "Si" : "No"));
     }
 }

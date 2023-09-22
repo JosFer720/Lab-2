@@ -1,17 +1,16 @@
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
- * Esta clase representa un edificio que puede contener varios salones.
+ * La clase Edificio representa un edificio con un nombre, un nivel y una lista de salones.
  */
 public class Edificio {
-    // Atributos del edificio
-    private String nombre;
-    private int nivel;
-    private List<Salon> salones;
+    private String nombre;       // Nombre del edificio
+    private int nivel;           // Nivel del edificio
+    private List<Salon> salones; // Lista de salones en el edificio
 
     /**
-     * Constructor de la clase Edificio.
+     * Constructor para crear un objeto Edificio.
      *
      * @param nombre El nombre del edificio.
      * @param nivel  El nivel del edificio.
@@ -41,48 +40,47 @@ public class Edificio {
     }
 
     /**
-     * Obtiene la lista de salones dentro del edificio.
+     * Obtiene la lista de salones en el edificio.
      *
-     * @return La lista de salones del edificio.
+     * @return La lista de salones en el edificio.
      */
     public List<Salon> getSalones() {
         return salones;
     }
 
     /**
-     * Agrega un salón al edificio.
+     * Agrega un nuevo salón al edificio con el ID y la capacidad especificados.
      *
-     * @param idSalon   El identificador único del salón.
-     * @param capacidad La capacidad del salón.
-     * @param horario   El horario del salón.
+     * @param idSalon   El ID del salón a agregar.
+     * @param capacidad La capacidad del salón a agregar.
      */
-    public void agregarSalon(int idSalon, int capacidad, Horario horario) {
-        // ...
+    public void agregarSalon(int idSalon, int capacidad) {
+        Salon salon = new Salon(idSalon, capacidad);
+        salones.add(salon);
     }
 
     /**
-     * Busca un salón en el edificio por su identificador único.
-     *
-     * @param idSalon El identificador único del salón a buscar.
-     * @return El salón encontrado o null si no se encuentra.
-     */
-    public Salon buscarSalonPorId(int idSalon) {
-        // ...
-    }
-
-    /**
-     * Busca salones disponibles en el edificio (con horarios disponibles).
+     * Busca y devuelve una lista de salones disponibles en el edificio.
      *
      * @return Una lista de salones disponibles en el edificio.
      */
     public List<Salon> buscarSalonesDisponibles() {
-        // ...
+        List<Salon> salonesDisponibles = new ArrayList<>();
+        for (Salon salon : salones) {
+            if (!salon.isOcupado()) {
+                salonesDisponibles.add(salon);
+            }
+        }
+        return salonesDisponibles;
     }
 
     /**
-     * Imprime la información del edificio, incluyendo sus salones.
+     * Imprime la información del edificio, incluyendo su nombre y la información de sus salones.
      */
     public void imprimirInformacionEdificio() {
-        // ...
+        System.out.println("Edificio: " + nombre);
+        for (Salon salon : salones) {
+            salon.imprimirInformacionSalon();
+        }
     }
 }

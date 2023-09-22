@@ -1,0 +1,10 @@
+ID Curso,Sede,Nombre del Curso,Horario,Cantidad de Estudiantes,Salón Asignado
+12,11,Ciencias,7,12,12
+23,22,Sociales,21,34,13
+123,33,Historia,12,13,23
+345,44,Programacion,10,32,56
+2345,77,Algebra,15,39,34
+566,99,Lengua,17,11,43
+321,88,Quimica,19,57,32
+32,55,Matematica,11,56,Sin Asignar
+1233,66,Calculo,12,45,Sin Asignar

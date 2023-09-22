@@ -10,15 +10,14 @@ public class Horario {
     /**
      * Constructor de la clase Horario.
      *
-     * @param horaInicio La hora de inicio del horario.
-     * @param horaFin    La hora de fin del horario.
+     * @param horaInicio
+     * @param horaFin
      */
     public Horario(int horaInicio, int horaFin) {
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
         this.disponibilidad = new boolean[15];
 
-        // Inicializa todas las horas como disponibles por defecto
         for (int i = 0; i < disponibilidad.length; i++) {
             disponibilidad[i] = true;
         }

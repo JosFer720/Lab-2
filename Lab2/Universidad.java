@@ -39,14 +39,14 @@ public class Universidad {
      *
      * @param archivoSalones El nombre del archivo CSV que contiene los datos de salones.
      */
-
     public void cargarSedesDesdeCSV(String archivoSalones) {
         try (BufferedReader br = new BufferedReader(new FileReader(archivoSalones))) {
-            br.readLine();
+            String header = br.readLine();
 
             String linea;
             while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(",");
+
                 if (datos.length == 5) {
                     int idSede = Integer.parseInt(datos[0].trim());
                     char edificioChar = datos[1].trim().charAt(0);
@@ -54,12 +54,18 @@ public class Universidad {
                     int idSalon = Integer.parseInt(datos[3].trim());
                     int capacidad = Integer.parseInt(datos[4].trim());
 
-                    Edificio edificioExistente = buscarEdificioPorNombre(String.valueOf(edificioChar));
+                    Sede sede = buscarSedePorId(idSede);
+                    if (sede == null) {
+                        sede = new Sede(idSede, "NombreDeSede");
+                        sedes.add(sede);
+                    }
+                    Edificio edificioExistente = sede.buscarEdificioPorNombre(String.valueOf(edificioChar));
                     if (edificioExistente == null) {
                         edificioExistente = new Edificio(String.valueOf(edificioChar), nivel);
-                        edificios.add(edificioExistente);
+                        sede.agregarEdificio(edificioExistente);
                     }
 
+                    edificioExistente.agregarSalon(idSalon, capacidad);
                 } else {
                     System.out.println("Formato incorrecto en la línea del archivo CSV de salones: " + linea);
                 }
@@ -92,44 +98,28 @@ public class Universidad {
      *
      * @param archivoCursos El nombre del archivo CSV que contiene los datos de cursos.
      */
-
     public void cargarCursosDesdeCSV(String archivoCursos) {
         try (BufferedReader br = new BufferedReader(new FileReader(archivoCursos))) {
-            br.readLine();
-
+            br.readLine(); 
             String linea;
             while ((linea = br.readLine()) != null) {
-                String[] datos = parsearLineaCSV(linea);
-                if (datos != null) {
-                    try {
-                        int idCurso = Integer.parseInt(datos[0].trim());
-                        int idSede = Integer.parseInt(datos[1].trim());
-                        String nombreCurso = datos[2].trim();
-                        int horario = Integer.parseInt(datos[3].trim());
-                        int duracion = Integer.parseInt(datos[4].trim());
-                        String[] dias = datos[5].trim().split(",");
-                        int cantidadEstudiantes = Integer.parseInt(datos[6].trim());
+                String[] datos = linea.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                        if (idCurso >= 1 && idSede >= 1 && horario >= 7 && horario <= 21
-                                && duracion >= 1 && duracion <= 3
-                                && cantidadEstudiantes >= 1 && cantidadEstudiantes <= 60) {
-                            System.out.println("ID Curso: " + idCurso);
-                            System.out.println("ID Sede: " + idSede);
-                            System.out.println("Nombre del Curso: " + nombreCurso);
-                            System.out.println("Horario: " + horario);
-                            System.out.println("Duración: " + duracion);
-                            System.out.println("Días: " + String.join(", ", dias));
-                            System.out.println("Cantidad de Estudiantes: " + cantidadEstudiantes);
+                if (datos.length == 7) {
+                    int idCurso = Integer.parseInt(datos[0].replaceAll("\"", "").trim());
+                    int idSede = Integer.parseInt(datos[1].replaceAll("\"", "").trim());
+                    String nombreCurso = datos[2].replaceAll("\"", "").trim();
+                    int horario = Integer.parseInt(datos[3].replaceAll("\"", "").trim());
+                    int duracion = Integer.parseInt(datos[4].replaceAll("\"", "").trim());
+                    String diasString = datos[5].replaceAll("\"", "").trim();
+                    String[] diasArray = diasString.split(",");
+                    List<String> dias = new ArrayList<>(Arrays.asList(diasArray));
+                    int cantidadEstudiantes = Integer.parseInt(datos[6].replaceAll("\"", "").trim());
 
-                        } else {
-                            System.out.println("Formato incorrecto en la línea del archivo CSV de cursos: " + linea);
-                        }
-
-                    } catch (NumberFormatException e) {
-                        System.out.println("Error al convertir un valor a número en la linea del archivo CSV: " + linea);
-                    }
+                    Curso curso = new Curso(idCurso, idSede, nombreCurso, horario, duracion, dias, cantidadEstudiantes);
+                    cursos.add(curso);
                 } else {
-                    System.out.println("Formato incorrecto en la linea del archivo CSV de cursos: " + linea);
+                    System.out.println("Formato incorrecto en la línea del archivo CSV de cursos: " + linea);
                 }
             }
             System.out.println("Datos de cursos cargados exitosamente.");
@@ -140,39 +130,27 @@ public class Universidad {
     }
 
     /**
-     * Parsea una línea de texto CSV en un arreglo de campos.
-     *
-     * @param linea La línea de texto CSV a ser parseada.
-     * @return Un arreglo de campos o null si la línea no se pudo parsear correctamente.
+     * Asigna salones a cursos.
      */
-
-    public String[] parsearLineaCSV(String linea) {
-        List<String> campos = new ArrayList<>();
-        StringBuilder campoActual = new StringBuilder();
-        boolean dentroDeComillas = false;
-
-        for (int i = 0; i < linea.length(); i++) {
-            char c = linea.charAt(i);
-
-            if (c == '"') {
-                dentroDeComillas = !dentroDeComillas;
-            } else if (c == ',' && !dentroDeComillas) {
-                campos.add(campoActual.toString().trim());
-                campoActual.setLength(0);
-            } else {
-                campoActual.append(c);
+    public void asignarSalones() {
+        cursosSinSalon.clear(); 
+        for (Curso curso : cursos) {
+            Sede sede = buscarSedePorId(curso.getIdSede());
+            if (sede != null) {
+                Salon salonDisponible = sede.buscarSalonDisponible();
+                if (salonDisponible != null) {
+                    if (curso.verificarCapacidad(salonDisponible.getCapacidad())) {
+                        curso.asignarSalon(salonDisponible); 
+                    } else {
+                        System.out.println("El salón no tiene capacidad suficiente para el curso: " + curso.getNombreCurso());
+                        cursosSinSalon.add(curso);
+                    }
+                } else {
+                    System.out.println("No se encontró un salón válido para el curso: " + curso.getNombreCurso());
+                    cursosSinSalon.add(curso);
+                }
             }
         }
-
-        campos.add(campoActual.toString().trim());
-
-        for (int i = 0; i < campos.size(); i++) {
-            String campo = campos.get(i);
-            campo = campo.replaceAll("\"\"", "\"");
-            campos.set(i, campo);
-        }
-
-        return campos.toArray(new String[0]);
     }
 
     /**
@@ -181,7 +159,6 @@ public class Universidad {
      * @param idSede El ID de la sede a consultar.
      * @return La sede encontrada o null si no se encontró ninguna con ese ID.
      */
-
     public Sede consultarSedePorId(int idSede) {
         for (Sede sede : sedes) {
             if (sede.getIdSede() == idSede) {
@@ -206,27 +183,6 @@ public class Universidad {
         }
         return null;
     }
-
-    /**
-     * Asigna salones a cursos.
-     */
-
-    public void asignarSalones() {
-        for (Curso curso : cursos) {
-            if (!curso.tieneSalonAsignado()) {
-                Sede sede = buscarSedePorId(curso.getIdSede());
-                if (sede != null) {
-                    Salon salonDisponible = sede.buscarSalonDisponible(curso);
-                    if (salonDisponible != null) {
-                        curso.asignarSalon(salonDisponible);
-                    } else {
-                        cursosSinSalon.add(curso);
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Genera un informe de cursos asignados y cursos sin salón asignado.
      */
@@ -235,11 +191,7 @@ public class Universidad {
         System.out.println("---- Cursos Asignados ----");
         for (Curso curso : cursos) {
             if (curso.tieneSalonAsignado()) {
-                System.out.println("ID del Curso: " + curso.getIdCurso());
-                System.out.println("Sede: " + curso.getIdSede());
-                System.out.println("Nombre del Curso: " + curso.getNombreCurso());
-                System.out.println("Horario: " + curso.getHorario());
-                System.out.println("Cantidad de Estudiantes: " + curso.getCantidadEstudiantes());
+                curso.imprimirInformacionCurso();
                 System.out.println("Salon Asignado: " + curso.getSalonAsignado().getIdSalon());
                 System.out.println();
             }
@@ -247,11 +199,8 @@ public class Universidad {
 
         System.out.println("---- Cursos Sin Salon Asignado ----");
         for (Curso curso : cursosSinSalon) {
-            System.out.println("ID del Curso: " + curso.getIdCurso());
-            System.out.println("Sede: " + curso.getIdSede());
-            System.out.println("Nombre del Curso: " + curso.getNombreCurso());
-            System.out.println("Horario: " + curso.getHorario());
-            System.out.println("Cantidad de Estudiantes: " + curso.getCantidadEstudiantes());
+            curso.imprimirInformacionCurso();
+            System.out.println("Sin Asignar");
             System.out.println();
         }
     }
@@ -332,8 +281,11 @@ public class Universidad {
                     break;
 
                 case 3:
-                    generarInforme();
-                    break;
+                    if (cursosSinSalon.isEmpty()) {
+                        System.out.println("No se han asignado salones a los cursos.");
+                    } else {
+                        generarInforme();
+                    }
 
                 case 4:
                     System.out.print("Ingrese el ID de la sede a consultar: ");
